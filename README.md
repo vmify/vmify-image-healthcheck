@@ -1,2 +1,2 @@
-# vmify-image-post
-Container image performing a Power-On-Self-Test upon boot and reporting the results via ip:80/ as key-value pairs
+# vmify-image-healthcheck
+Container image performing a healthcheck upon boot and reporting the results via ip:80/healthcheck.json
