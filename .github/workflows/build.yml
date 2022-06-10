@@ -32,5 +32,4 @@ jobs:
           push: true
           tags: |
             ghcr.io/vmify/vmify-image-healthcheck:latest
-
-# ghcr.io/vmify/vmify-image-healthcheck:${{ env.GITHUB_RUN_NUMBER }}
+            ghcr.io/vmify/vmify-image-healthcheck:${{ github.run_number }}
