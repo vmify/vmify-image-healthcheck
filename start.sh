@@ -11,4 +11,14 @@ cat > /home/static/healthcheck.json<< EOF
 }
 EOF
 
-thttpd -D -h 0.0.0.0 -p 80 -d /home/static -u static -l - -M 60
+log_file=/home/static/thttpd.log
+pid_file=/home/static/thttpd.pid
+
+thttpd -D -h 0.0.0.0 -p 80 -d /home/static -u static -l $log_file -i $pid_file -M 60 &
+
+while [ "$(grep 'GET /healthcheck.json HTTP/1.1' $log_file)" = "" ]
+do
+  sleep 1
+done
+
+kill "$(cat $pid_file)"
