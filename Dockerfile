@@ -6,6 +6,7 @@ RUN adduser -D static
 USER static
 WORKDIR /home/static
 
-ADD --chmod=+x start.sh /start.sh
+ADD start.sh /start.sh
+RUN chmod +x /start.sh
 
 ENTRYPOINT /start.sh
