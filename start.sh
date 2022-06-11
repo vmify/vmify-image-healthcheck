@@ -5,6 +5,7 @@ eth0_hostname=$(hostname)
 
 cat > /home/static/healthcheck.json<< EOF
 {
+  "healthcheck":true,
   "ip":"$eth0_ip",
   "hostname":"$eth0_hostname"
 }
