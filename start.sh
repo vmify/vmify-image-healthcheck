@@ -14,6 +14,8 @@ EOF
 log_file=/home/static/thttpd.log
 pid_file=/home/static/thttpd.pid
 
+# Ensure log file gets created first, so there is no race between thttpd and grep
+touch $log_file
 thttpd -D -h 0.0.0.0 -p 80 -d /home/static -u static -l $log_file -i $pid_file -M 60 &
 
 while [ "$(grep 'GET /healthcheck.json HTTP/1.1' $log_file)" = "" ]
