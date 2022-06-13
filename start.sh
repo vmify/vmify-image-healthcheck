@@ -18,9 +18,14 @@ pid_file=/home/static/thttpd.pid
 touch $log_file
 thttpd -D -h 0.0.0.0 -p 80 -d /home/static -u static -l $log_file -i $pid_file -M 60 &
 
+echo "vmify-image-healthcheck is up and running!"
+
 while [ "$(grep 'GET /healthcheck.json HTTP/1.1' $log_file)" = "" ]
 do
   sleep 1
 done
+
+echo "Access log:"
+cat $log_file
 
 kill "$(cat $pid_file)"
