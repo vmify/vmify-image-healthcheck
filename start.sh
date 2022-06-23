@@ -7,13 +7,15 @@ if [ -f /proc/modules ]; then
 else
   modules="false"
 fi
+swap_total=$(free | tail -1 | tr -s ' ' | cut -d ' ' -f 2)
 
 cat > /home/static/healthcheck.json<< EOF
 {
   "healthcheck":true,
   "ip":"$eth0_ip",
   "hostname":"$eth0_hostname",
-  "modules":$modules
+  "modules":$modules,
+  "swap_total":$swap_total
 }
 EOF
 
