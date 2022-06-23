@@ -8,4 +8,5 @@ WORKDIR /home/static
 
 ADD start.sh /start.sh
 
+EXPOSE 80
 ENTRYPOINT /start.sh
