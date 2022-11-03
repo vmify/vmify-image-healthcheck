@@ -22,7 +22,4 @@ cat > healthcheck.json<< EOF
 EOF
 
 echo "vmify-image-healthcheck starting ..."
-httpd -vv
-
-# Auto-terminate after timeout
-sleep 300
+httpd -f -vv
