@@ -24,5 +24,5 @@ EOF
 echo "vmify-image-healthcheck starting ..."
 httpd -vv
 
-# Auto-terminate after 60 seconds
-sleep 60
+# Auto-terminate after timeout
+sleep 300
