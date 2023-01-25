@@ -1,4 +1,4 @@
-FROM busybox:1.34.1
+FROM busybox:1.36.0-uclibc
 
 ADD start.sh /start.sh
 
