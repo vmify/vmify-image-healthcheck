@@ -12,7 +12,8 @@ disks=$(tail +3 /proc/partitions | awk '{ print "\"" $4 "\":" $3*1024 }' | tr '\
 mounts=$(awk '{ print "\"" $2 "\":\"" $1 " " $3 " " $4 " " $5 " " $6 "\"" }' /proc/mounts | sort | tr '\n' ',' | sed 's/.$//')
 swap_total=$(free | tail -1 | tr -s ' ' | cut -d ' ' -f 2)
 envs=$(env | sort | sed 's/=/":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
-pss=$(ps ax | tail +2 | head -n -4 | awk '{$2=$3=$4=""; print $0}' | tr -s " " | sed 's/ /":"/' | awk '{print "\"" $0 "\""}' | tr '\n' ',' | sed 's/.$//')
+psax=$(ps ax)
+pss=$(echo "$psax" | tail +2 | head -n -1 | awk '{$2=$3=""; print $0}' | tr -s " " | sed 's/ /":"/' | awk '{print "\"" $0 "\""}' | tr '\n' ',' | sed 's/.$//')
 
 mkdir http
 cd http
