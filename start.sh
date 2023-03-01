@@ -8,7 +8,7 @@ eth0_ip=$(ifconfig eth0 | grep 'inet ' | cut -d ':' -f 2 | cut -d ' ' -f 1)
 eth0_hostname=$(hostname)
 eth0_ntp_servers=$(cat /proc/net/ipconfig/ntp_servers)
 
-disks=$(tail +3 /proc/partitions | awk '{ print "\"" $4 "\":" $3*1024 }' | tr '\n' ',' | sed 's/.$//')
+disks=$(tail +3 /proc/partitions | awk '{ print "\"" $4 "\":" $3*1024 }' | sort | tr '\n' ',' | sed 's/.$//')
 mounts=$(awk '{ print "\"" $2 "\":\"" $1 " " $3 " " $4 " " $5 " " $6 "\"" }' /proc/mounts | sort | tr '\n' ',' | sed 's/.$//')
 swap_total=$(free | tail -1 | tr -s ' ' | cut -d ' ' -f 2)
 envs=$(env | sort | sed 's/=/":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
