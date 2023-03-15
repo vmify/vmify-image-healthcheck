@@ -1,7 +1,8 @@
 FROM busybox:1.36.0-uclibc
 
-ENV TEST_VAL=immutable
-ENV TEST_VAR=original
+ENV TEST_VAR_IMAGE_IMAGE=image
+ENV TEST_VAR_IMAGE_INSTANCE=image
+ENV TEST_VAR_IMAGE_ARGUMENT=image
 ADD start.sh /start.sh
 
 EXPOSE 80
