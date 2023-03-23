@@ -18,12 +18,13 @@ swap_total=$(free | tail -1 | tr -s ' ' | cut -d ' ' -f 2)
 envs=$(env | sort | sed 's/=/":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
 psax=$(ps ax)
 pss=$(echo "$psax" | tail +2 | head -n -1 | awk '{$2=$3=""; print $0}' | tr -s " " | sed 's/ /":"/' | awk '{print "\"" $0 "\""}' | tr '\n' ',' | sed 's/.$//')
+boot_timestamp=$(uptime -s)
 
-mkdir http
 cd http
 cat > healthcheck.json<< EOF
 {
   "healthcheck":true,
+  "boot_timestamp":"$boot_timestamp",
   "modules":$modules,
   "bios_version":"$bios_version",
   "chassis_asset_tag":"$chassis_asset_tag",
