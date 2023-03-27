@@ -16,6 +16,7 @@ while pidof mkswap swapon > /dev/null; do sleep 1; done
 swap_total=$(free | tail -1 | tr -s ' ' | cut -d ' ' -f 2)
 
 envs=$(env | sort | sed 's/=/":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
+sysctls=$(sysctl -a | sed 's/ = /":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
 psax=$(ps ax)
 pss=$(echo "$psax" | tail +2 | head -n -1 | awk '{$2=$3=""; print $0}' | tr -s " " | sed 's/ /":"/' | awk '{print "\"" $0 "\""}' | tr '\n' ',' | sed 's/.$//')
 boot_timestamp=$(uptime -s)
@@ -36,6 +37,7 @@ cat > healthcheck.json<< EOF
   "disks":{$disks},
   "mounts":{$mounts},
   "swap_total":$swap_total,
+  "sysctl":{$sysctls},
   "env":{$envs},
   "ps":{$pss}
 }
