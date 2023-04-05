@@ -16,12 +16,18 @@ get_swap_total() {
 }
 
 # Wait for swap to come online
-swap_total=$(get_swap_total)
+swap_kib=$(get_swap_total)
 if [ "$SWAP" != "0" ]; then
-  while [ "$swap_total" = "0" ] ; do
+  while [ "$swap_kib" = "0" ] ; do
     sleep 1
-    swap_total=$(get_swap_total)
+    swap_kib=$(get_swap_total)
   done
+fi
+
+if [ -d "/tmp" ]; then
+  temp_kib=$(df /tmp | tail -1 | awk '{print $2}')
+else
+  temp_kib=0
 fi
 
 envs=$(env | sort | sed 's/=/":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
@@ -45,7 +51,8 @@ cat > healthcheck.json<< EOF
   },
   "disks":{$disks},
   "mounts":{$mounts},
-  "swap_total":$swap_total,
+  "swap_kib":$swap_kib,
+  "temp_kib":$temp_kib,
   "sysctl":{$sysctls},
   "env":{$envs},
   "ps":{$pss}
