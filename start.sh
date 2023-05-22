@@ -2,6 +2,7 @@
 
 if [ -f /proc/modules ]; then modules="true"; else modules="false"; fi
 
+readonly user=$(whoami)
 readonly bios_version=$(cat /sys/devices/virtual/dmi/id/bios_version)
 readonly chassis_asset_tag=$(cat /sys/devices/virtual/dmi/id/chassis_asset_tag)
 readonly eth0_ip=$(ifconfig eth0 | grep 'inet ' | cut -d ':' -f 2 | cut -d ' ' -f 1)
@@ -37,7 +38,6 @@ readonly psax=$(ps ax)
 readonly pss=$(echo "$psax" | tail +2 | head -n -1 | awk '{$2=$3=""; print $0}' | tr -s " " | sed 's/ /":"/' | awk '{print "\"" $0 "\""}' | tr '\n' ',' | sed 's/.$//')
 readonly boot_timestamp=$(uptime -s)
 
-cd http
 cat > healthcheck.json<< EOF
 {
   "healthcheck":true,
@@ -57,6 +57,7 @@ cat > healthcheck.json<< EOF
   "temp_kib":$temp_kib,
   "sysctl":{$sysctls},
   "env":{$envs},
+  "user":"$user",
   "ps":{$pss}
 }
 EOF
