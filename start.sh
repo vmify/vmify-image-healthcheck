@@ -20,6 +20,7 @@ echo "-> disks"
 readonly disks=$(tail +3 /proc/partitions | awk '{ print "\"" $4 "\":" $3*1024 }' | sort | tr '\n' ',' | sed 's/.$//')
 readonly mounts=$(awk '{ print "\"" $2 "\":\"" $1 " " $3 " " $4 " " $5 " " $6 "\"" }' /proc/mounts | sort | tr '\n' ',' | sed 's/.$//')
 
+echo "-> swap"
 get_swap_total() {
   free | tail -1 | tr -s ' ' | cut -d ' ' -f 2
 }
@@ -33,6 +34,7 @@ if [ "$SWAP" != "0" ]; then
   done
 fi
 
+echo "-> tmp"
 if [ -d "/tmp" ]; then
   readonly temp_kib=$(df /tmp | tail -1 | awk '{print $2}')
 else
