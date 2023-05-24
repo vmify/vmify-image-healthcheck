@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo "vmify-image-healthcheck collecting info ..."
+
 if [ -f /proc/modules ]; then modules="true"; else modules="false"; fi
 
 readonly user=$(whoami)
@@ -62,6 +64,6 @@ cat > healthcheck.json<< EOF
 }
 EOF
 
-echo "vmify-image-healthcheck starting ..."
+echo "vmify-image-healthcheck starting httpd ..."
 cat healthcheck.json
-timeout 10m httpd -f -vv -p 8000
+timeout 10m httpd -f -vv -p 80
