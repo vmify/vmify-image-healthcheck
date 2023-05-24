@@ -78,4 +78,4 @@ EOF
 cat healthcheck.json
 
 echo "vmify-image-healthcheck starting httpd ..."
-timeout 10m httpd -f -vv -p 80
+timeout 10m httpd -f -vv -p "$PORT"
