@@ -5,7 +5,10 @@ echo "vmify-image-healthcheck collecting info ..."
 echo "-> kernel"
 if [ -f /proc/modules ]; then modules="true"; else modules="false"; fi
 readonly sysctls=$(sysctl -a | sed 's/ = /":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
-readonly caps_ambient=$(setpriv -d | grep "Ambient capabilities:" | cut -d':' -f2 | xargs)
+caps=$(setpriv -d | grep "Ambient capabilities:" | cut -d':' -f2 | xargs | tr a-z A-Z | tr ',' '\n' | sort | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
+if [ "$caps" = '"[NONE]"' ]; then
+  readonly caps=''
+fi
 
 echo "-> hardware"
 readonly bios_version=$(cat /sys/devices/virtual/dmi/id/bios_version)
@@ -71,7 +74,7 @@ cat > healthcheck.json<< EOF
   "sysctl":{$sysctls},
   "env":{$envs},
   "user":"$user",
-  "caps":"$caps_ambient",
+  "caps":[$caps],
   "ps":{$pss}
 }
 EOF
