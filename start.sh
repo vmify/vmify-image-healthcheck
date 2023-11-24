@@ -80,7 +80,9 @@ cat > healthcheck.json<< EOF
 EOF
 cat healthcheck.json
 
-echo "vmify-image-healthcheck starting httpd ..."
-timeout 10m httpd -f -vv -p "$PORT"
+readonly kill_timeout=300
+echo "vmify-image-healthcheck starting httpd (auto-terminates after ${kill_timeout}s) ..."
+nohup sh -c "sleep $kill_timeout ; /http/cgi-bin/kill.sh" &
+httpd -f -vv -p "$PORT"
 
 echo "vmify-image-healthcheck terminating ..."
