@@ -9,6 +9,7 @@ caps=$(setpriv -d | grep "Ambient capabilities:" | cut -d':' -f2 | xargs | tr a-
 if [ "$caps" = '"[NONE]"' ]; then
   readonly caps=''
 fi
+if [ "$(setpriv -d | grep "no_new_privs:" | cut -d': ' -f2)" = " 0" ]; then no_new_privs="false"; else no_new_privs="true"; fi
 
 echo "-> hardware"
 readonly bios_version=$(cat /sys/devices/virtual/dmi/id/bios_version)
@@ -75,6 +76,7 @@ cat > healthcheck.json<< EOF
   "env":{$envs},
   "user":"$user",
   "caps":[$caps],
+  "no_new_privs":$no_new_privs,
   "ps":{$pss}
 }
 EOF
