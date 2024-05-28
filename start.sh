@@ -5,6 +5,7 @@ echo "vmify-image-healthcheck collecting info ..."
 echo "-> kernel"
 if [ -f /proc/modules ]; then modules="true"; else modules="false"; fi
 readonly sysctls=$(sysctl -a | sed 's/ = /":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
+readonly binfmt_misc=$(cat /proc/sys/fs/binfmt_misc/status || echo "unsupported")
 caps=$(setpriv -d | grep "Ambient capabilities:" | cut -d':' -f2 | xargs | tr a-z A-Z | tr ',' '\n' | sort | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
 if [ "$caps" = '"[NONE]"' ]; then
   readonly caps=''
@@ -60,6 +61,7 @@ cat > healthcheck.json<< EOF
   "healthcheck":true,
   "boot_timestamp":"$boot_timestamp",
   "modules":$modules,
+  "binfmt_misc":"$binfmt_misc",
   "bios_version":"$bios_version",
   "chassis_asset_tag":"$chassis_asset_tag",
   "network":{
