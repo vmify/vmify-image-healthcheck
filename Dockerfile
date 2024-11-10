@@ -7,6 +7,7 @@ ENV TEST_VAR_IMAGE_INSTANCE=image
 ENV TEST_VAR_IMAGE_ARGUMENT=image
 ADD start.sh /start.sh
 ADD kill.sh /http/cgi-bin/kill.sh
+ADD elf32 /elf32
 RUN addgroup -S testgroup && adduser -S -H -G testgroup testuser && chmod 777 /http
 USER testuser
 WORKDIR /http

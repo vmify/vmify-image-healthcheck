@@ -11,6 +11,7 @@ if [ "$caps" = '"[NONE]"' ]; then
   readonly caps=''
 fi
 if [ "$(setpriv -d | grep "no_new_privs:" | cut -d': ' -f2)" = " 0" ]; then no_new_privs="false"; else no_new_privs="true"; fi
+if [ "$(/elf32)" = "Hello world" ]; then elf32="true"; else elf32="false"; fi
 
 echo "-> hardware"
 readonly bios_version=$(cat /sys/devices/virtual/dmi/id/bios_version)
@@ -62,6 +63,7 @@ cat > healthcheck.json<< EOF
   "boot_timestamp":"$boot_timestamp",
   "modules":$modules,
   "binfmt_misc":"$binfmt_misc",
+  "elf32":"$elf32",
   "bios_version":"$bios_version",
   "chassis_asset_tag":"$chassis_asset_tag",
   "network":{
