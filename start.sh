@@ -63,7 +63,7 @@ cat > healthcheck.json<< EOF
   "boot_timestamp":"$boot_timestamp",
   "modules":$modules,
   "binfmt_misc":"$binfmt_misc",
-  "elf32":"$elf32",
+  "elf32":$elf32,
   "bios_version":"$bios_version",
   "chassis_asset_tag":"$chassis_asset_tag",
   "network":{
