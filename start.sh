@@ -15,7 +15,9 @@ readonly elf32=$(if [ "$(/elf32)" = "Hello world" ]; then echo "true"; else echo
 
 touch test-xattr
 setfattr -n user.testattr -v "success" test-xattr
-readonly xattr=$( (getfattr -n user.testattr test-xattr | grep "success" > /dev/null) && echo "true" || echo "false")
+readonly xattr_user=$( (getfattr -n user.testattr test-xattr | grep "success" > /dev/null) && echo "true" || echo "false")
+setfattr -n security.smack -v 0 test-xattr
+readonly xattr_security=$( (getfattr -n security.smack test-xattr > /dev/null) && echo "true" || echo "false")
 
 echo "-> hardware"
 readonly bios_version=$(cat /sys/devices/virtual/dmi/id/bios_version)
@@ -68,7 +70,8 @@ cat > healthcheck.json<< EOF
   "modules":$modules,
   "binfmt_misc":"$binfmt_misc",
   "elf32":$elf32,
-  "xattr":$xattr,
+  "xattr_user":$xattr_user,
+  "xattr_security":$xattr_security,
   "bios_version":"$bios_version",
   "chassis_asset_tag":"$chassis_asset_tag",
   "network":{
