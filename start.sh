@@ -3,15 +3,19 @@
 echo "vmify-image-healthcheck collecting info ..."
 
 echo "-> kernel"
-if [ -f /proc/modules ]; then modules="true"; else modules="false"; fi
+if [ -f /proc/modules ]; then readonly modules="true"; else readonly modules="false"; fi
 readonly sysctls=$(sysctl -a | sed 's/ = /":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
 readonly binfmt_misc=$(cat /proc/sys/fs/binfmt_misc/status || echo "unsupported")
 caps=$(setpriv -d | grep "Ambient capabilities:" | cut -d':' -f2 | xargs | tr a-z A-Z | tr ',' '\n' | sort | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
 if [ "$caps" = '"[NONE]"' ]; then
   readonly caps=''
 fi
-if [ "$(setpriv -d | grep "no_new_privs:" | cut -d': ' -f2)" = " 0" ]; then no_new_privs="false"; else no_new_privs="true"; fi
-if [ "$(/elf32)" = "Hello world" ]; then elf32="true"; else elf32="false"; fi
+readonly no_new_privs=$(if [ "$(setpriv -d | grep "no_new_privs:" | cut -d': ' -f2)" = " 0" ]; then echo "false"; else echo "true"; fi)
+readonly elf32=$(if [ "$(/elf32)" = "Hello world" ]; then echo "true"; else echo "false"; fi)
+
+touch test-xattr
+setfattr -n user.testattr -v "success" test-xattr
+readonly xattr=$( (getfattr -n user.testattr test-xattr | grep "success" > /dev/null) && echo "true" || echo "false")
 
 echo "-> hardware"
 readonly bios_version=$(cat /sys/devices/virtual/dmi/id/bios_version)
@@ -64,6 +68,7 @@ cat > healthcheck.json<< EOF
   "modules":$modules,
   "binfmt_misc":"$binfmt_misc",
   "elf32":$elf32,
+  "xattr":$xattr,
   "bios_version":"$bios_version",
   "chassis_asset_tag":"$chassis_asset_tag",
   "network":{

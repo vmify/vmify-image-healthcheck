@@ -1,4 +1,4 @@
-FROM busybox:1.36.1-uclibc
+FROM busybox:1.37.0-uclibc
 
 ARG PORT=80
 ENV PORT=$PORT
