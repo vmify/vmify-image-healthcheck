@@ -19,6 +19,11 @@ readonly xattr_user=$( (getfattr -n user.testattr test-xattr | grep "success" > 
 setfattr -n security.smack -v 0 test-xattr
 readonly xattr_security=$( (getfattr -n security.smack test-xattr > /dev/null) && echo "true" || echo "false")
 
+dd if=/dev/zero of=test-loop.img bs=1M count=10 > /dev/null 2>&1
+readonly loop_device=$(losetup -f)
+readonly loop=$( (losetup "$loop_device" test-loop.img) && echo "true" || echo "false")
+losetup -d "$loop_device"
+
 echo "-> hardware"
 readonly bios_version=$(cat /sys/devices/virtual/dmi/id/bios_version)
 readonly chassis_asset_tag=$(cat /sys/devices/virtual/dmi/id/chassis_asset_tag)
@@ -72,6 +77,7 @@ cat > healthcheck.json<< EOF
   "elf32":$elf32,
   "xattr_user":$xattr_user,
   "xattr_security":$xattr_security,
+  "loop":$loop,
   "bios_version":"$bios_version",
   "chassis_asset_tag":"$chassis_asset_tag",
   "network":{
