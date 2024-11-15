@@ -21,6 +21,8 @@ readonly xattr_security=$( (getfattr -n security.smack test-xattr > /dev/null) &
 
 readonly fd=$( (echo "true"> >(tee test-tee.log)) || echo "false")
 
+readonly dev_shm=$(ls -ld /dev/shm | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
+
 dd if=/dev/zero of=test-loop.img bs=1M count=10
 readonly loop_device=$(losetup -f)
 readonly loop=$( (losetup "$loop_device" test-loop.img) && echo "true" || echo "false")
@@ -80,6 +82,7 @@ cat > healthcheck.json<< EOF
   "xattr_user":$xattr_user,
   "xattr_security":$xattr_security,
   "fd":$fd,
+  "dev_shm":"$dev_shm",
   "loop":$loop,
   "bios_version":"$bios_version",
   "chassis_asset_tag":"$chassis_asset_tag",
