@@ -10,7 +10,7 @@ RUN chmod 4555 /bin/busybox /bin/getfattr /bin/setfattr /bin/losetup \
 ADD start.sh /start.sh
 ADD kill.sh /http/cgi-bin/kill.sh
 ADD elf32 /elf32
-RUN addgroup -S testgroup && adduser -S -H -G testgroup testuser && adduser testuser disk && chmod 777 /http
+RUN addgroup -S testgroup && adduser -S -H -G testgroup testuser && chmod 777 /http
 USER testuser
 WORKDIR /http
 
