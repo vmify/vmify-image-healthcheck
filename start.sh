@@ -29,6 +29,9 @@ readonly loop_device=$(losetup -f)
 readonly loop=$( (losetup "$loop_device" test-loop.img) && echo "true" || echo "false")
 losetup -d "$loop_device"
 
+readonly apparmor=$(if [ "$(cat /sys/module/apparmor/parameters/enabled)" = "Y" ]; then echo "true"; else echo "false"; fi)
+readonly securityfs=$(ls -ld /sys/kernel/security | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
+
 echo "-> hardware"
 readonly bios_version=$(cat /sys/devices/virtual/dmi/id/bios_version)
 readonly chassis_asset_tag=$(cat /sys/devices/virtual/dmi/id/chassis_asset_tag)
@@ -86,6 +89,8 @@ cat > healthcheck.json<< EOF
   "dev_mqueue":"$dev_mqueue",
   "dev_shm":"$dev_shm",
   "loop":$loop,
+  "apparmor":$apparmor,
+  "securityfs":"$securityfs",
   "bios_version":"$bios_version",
   "chassis_asset_tag":"$chassis_asset_tag",
   "network":{
