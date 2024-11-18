@@ -3,7 +3,7 @@
 echo "vmify-image-healthcheck collecting info ..."
 
 echo "-> kernel"
-if [ -f /proc/modules ]; then readonly modules="true"; else readonly modules="false"; fi
+readonly modules=$(if [ -f /proc/modules ]; then echo "true"; else echo "false"; fi)
 readonly sysctls=$(sysctl -a | sed 's/ = /":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
 readonly binfmt_misc=$(cat /proc/sys/fs/binfmt_misc/status || echo "unsupported")
 caps=$(setpriv -d | grep "Ambient capabilities:" | cut -d':' -f2 | xargs | tr a-z A-Z | tr ',' '\n' | sort | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
@@ -12,6 +12,7 @@ if [ "$caps" = '"[NONE]"' ]; then
 fi
 readonly no_new_privs=$(if [ "$(setpriv -d | grep "no_new_privs:" | cut -d': ' -f2)" = " 0" ]; then echo "false"; else echo "true"; fi)
 readonly elf32=$(if [ "$(/elf32)" = "Hello world" ]; then echo "true"; else echo "false"; fi)
+readonly bpf_syscall=$(grep -q '\bbpf_sys_bpf\b' /proc/kallsyms && echo true || echo false)
 
 touch test-xattr
 setfattr -n user.testattr -v "success" test-xattr
@@ -25,7 +26,7 @@ readonly hugepages=$(ls -ld /dev/hugepages | awk '{$2=$5=$6=$7=$8=""; print $1, 
 readonly mqueue=$(ls -ld /dev/mqueue | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 readonly shm=$(ls -ld /dev/shm | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 
-dd if=/dev/zero of=test-loop.img bs=1M count=10
+dd if=/dev/zero of=test-loop.img bs=1M count=10 > /dev/null
 readonly loop_device=$(losetup -f)
 readonly loop=$( (losetup "$loop_device" test-loop.img) && echo "true" || echo "false")
 losetup -d "$loop_device"
@@ -84,6 +85,7 @@ cat > healthcheck.json<< EOF
   "modules":$modules,
   "binfmt_misc":"$binfmt_misc",
   "elf32":$elf32,
+  "bpf_syscall":$bpf_syscall,
   "xattr_user":$xattr_user,
   "xattr_security":$xattr_security,
   "fd":$fd,
