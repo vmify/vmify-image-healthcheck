@@ -26,10 +26,10 @@ readonly hugepages=$(ls -ld /dev/hugepages | awk '{$2=$5=$6=$7=$8=""; print $1, 
 readonly mqueue=$(ls -ld /dev/mqueue | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 readonly shm=$(ls -ld /dev/shm | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 
-dd if=/dev/zero of=test-loop.img bs=1M count=10 > /dev/null
-readonly loop_device=$(losetup -f)
-readonly loop=$( (losetup "$loop_device" test-loop.img) && echo "true" || echo "false")
-losetup -d "$loop_device"
+dd if=/dev/zero of=test-loop.img bs=1M count=10 2> /dev/null
+
+readonly loop=$( (losetup -f test-loop.img) && echo "true" || echo "false")
+losetup -d $(losetup -a | grep 'test-loop.img' | cut -d':' -f1)
 
 readonly apparmor=$(if [ "$(cat /sys/module/apparmor/parameters/enabled)" = "Y" ]; then echo "true"; else echo "false"; fi)
 readonly securityfs=$(ls -ld /sys/kernel/security | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
