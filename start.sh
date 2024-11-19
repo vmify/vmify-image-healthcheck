@@ -21,16 +21,10 @@ setfattr -n security.smack -v 0 test-xattr
 readonly xattr_security=$( (getfattr -n security.smack test-xattr > /dev/null) && echo "true" || echo "false")
 
 readonly fd=$( (echo "true"> >(tee test-tee.log)) || echo "false")
-
 readonly hugepages=$(ls -ld /dev/hugepages | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 readonly mqueue=$(ls -ld /dev/mqueue | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 readonly shm=$(ls -ld /dev/shm | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
-
-dd if=/dev/zero of=test-loop.img bs=1M count=10 2> /dev/null
-
-readonly loop=$( (losetup -f test-loop.img) && echo "true" || echo "false")
-losetup -d $(losetup -a | grep 'test-loop.img' | cut -d':' -f1)
-
+readonly loop=$(if [ -b /dev/loop0 ]; then echo "true"; else echo "false"; fi)
 readonly apparmor=$(if [ "$(cat /sys/module/apparmor/parameters/enabled)" = "Y" ]; then echo "true"; else echo "false"; fi)
 readonly securityfs=$(ls -ld /sys/kernel/security | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 
