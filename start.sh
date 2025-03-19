@@ -114,6 +114,9 @@ cat healthcheck.json
 readonly kill_timeout=300
 echo "vmify-image-healthcheck starting httpd (auto-terminates after ${kill_timeout}s) ..."
 nohup sh -c "sleep $kill_timeout ; /http/cgi-bin/kill.sh" &
-httpd -f -vv -p "$PORT"
+
+trap 'true' SIGTERM
+httpd -f -vv -p "$PORT" &
+wait $!
 
 echo "vmify-image-healthcheck terminating ..."
