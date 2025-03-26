@@ -39,6 +39,7 @@ readonly eth0_ntp_servers=$(cat /proc/net/ipconfig/ntp_servers)
 readonly etc_hosts=$(awk '{ printf "\"" $1 "\":\"";for (i=2; i<NF; i++) printf $i " "; printf $NF "\"," }' /etc/hosts | sed 's/.$//')
 
 echo "-> disks"
+readonly block_devices=$(ls -l /sys/class/block | tail +2 | awk '{print "\""$9"\":\""$11"\""}' | tr '\n' ',')
 readonly disks=$(tail +3 /proc/partitions | awk '{ print "\"" $4 "\":" $3*1024 }' | sort | tr '\n' ',' | sed 's/.$//')
 readonly mounts=$(awk '{ print "\"" $2 "\":\"" $1 " " $3 " " $4 " " $5 " " $6 "\"" }' /proc/mounts | sort | tr '\n' ',' | sed 's/.$//')
 
@@ -97,6 +98,7 @@ cat > healthcheck.json<< EOF
     "ntp_servers":"$eth0_ntp_servers",
     "hosts":{$etc_hosts}
   },
+  "block_devices":{$block_devices},
   "disks":{$disks},
   "mounts":{$mounts},
   "swap_kib":$swap_kib,
