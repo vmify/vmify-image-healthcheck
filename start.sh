@@ -4,7 +4,7 @@ echo "vmify-image-healthcheck collecting info ..."
 
 echo "-> kernel"
 readonly modules=$(if [ -f /proc/modules ]; then echo "true"; else echo "false"; fi)
-readonly sysctls=$(sysctl -a | sed 's/ = /":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
+readonly sysctls=$(sysctl -a | sed 's/ = /":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//' | sed 's/",/",\n    /g')
 readonly binfmt_misc=$(cat /proc/sys/fs/binfmt_misc/status || echo "unsupported")
 caps=$(setpriv -d | grep "Ambient capabilities:" | cut -d':' -f2 | xargs | tr a-z A-Z | tr ',' '\n' | sort | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
 if [ "$caps" = '"[NONE]"' ]; then
@@ -36,12 +36,12 @@ echo "-> network"
 readonly eth0_ip=$(ifconfig eth0 | grep 'inet ' | cut -d ':' -f 2 | cut -d ' ' -f 1)
 readonly eth0_hostname=$(hostname)
 readonly eth0_ntp_servers=$(cat /proc/net/ipconfig/ntp_servers)
-readonly etc_hosts=$(awk '{ printf "\"" $1 "\":\"";for (i=2; i<NF; i++) printf $i " "; printf $NF "\"," }' /etc/hosts | sed 's/.$//')
+readonly etc_hosts=$(awk '{ printf "\"" $1 "\":\"";for (i=2; i<NF; i++) printf $i " "; printf $NF "\"," }' /etc/hosts | sed 's/.$//' | sed 's/",/",\n      /g')
 
 echo "-> disks"
-readonly block_devices=$(ls -l /sys/class/block | tail +2 | awk '{print "\""$9"\":\""$11"\""}' | tr '\n' ',')
-readonly disks=$(tail +3 /proc/partitions | awk '{ print "\"" $4 "\":" $3*1024 }' | sort | tr '\n' ',' | sed 's/.$//')
-readonly mounts=$(awk '{ print "\"" $2 "\":\"" $1 " " $3 " " $4 " " $5 " " $6 "\"" }' /proc/mounts | sort | tr '\n' ',' | sed 's/.$//')
+readonly block_devices=$(ls -l /sys/class/block | tail +2 | awk '{print "\""$9"\":\""$11"\""}' | tr '\n' ',' | sed 's/.$//' | sed 's/,/,\n    /g')
+readonly disks=$(tail +3 /proc/partitions | awk '{ print "\"" $4 "\":" $3*1024 }' | sort | tr '\n' ',' | sed 's/.$//' | sed 's/,/,\n    /g')
+readonly mounts=$(awk '{ print "\"" $2 "\":\"" $1 " " $3 " " $4 " " $5 " " $6 "\"" }' /proc/mounts | sort | tr '\n' ',' | sed 's/.$//' | sed 's/",/",\n    /g')
 
 echo "-> swap"
 get_swap_total() {
@@ -66,9 +66,9 @@ fi
 
 echo "-> environment"
 readonly user=$(whoami)
-readonly envs=$(env | sort | sed 's/=/":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//')
+readonly envs=$(env | sort | sed 's/=/":"/' | awk '{print "\""$1"\""}' | tr '\n' ',' | sed 's/.$//' | sed 's/",/",\n    /g')
 readonly psax=$(ps ax)
-readonly pss=$(echo "$psax" | tail +2 | head -n -1 | awk '{$2=$3=""; print $0}' | tr -s " " | sed 's/ /":"/' | awk '{print "\"" $0 "\""}' | tr '\n' ',' | sed 's/.$//')
+readonly pss=$(echo "$psax" | tail +2 | head -n -1 | awk '{$2=$3=""; print $0}' | tr -s " " | sed 's/ /":"/' | awk '{print "\"" $0 "\""}' | tr '\n' ',' | sed 's/.$//' | sed 's/",/",\n    /g')
 readonly boot_timestamp=$(uptime -s)
 
 echo "vmify-image-healthcheck writing json ..."
@@ -96,19 +96,33 @@ cat > healthcheck.json<< EOF
     "ip":"$eth0_ip",
     "hostname":"$eth0_hostname",
     "ntp_servers":"$eth0_ntp_servers",
-    "hosts":{$etc_hosts}
+    "hosts":{
+      $etc_hosts
+    }
   },
-  "block_devices":{$block_devices},
-  "disks":{$disks},
-  "mounts":{$mounts},
+  "block_devices":{
+    $block_devices
+  },
+  "disks":{
+    $disks
+  },
+  "mounts":{
+    $mounts
+  },
   "swap_kib":$swap_kib,
   "temp_kib":$temp_kib,
-  "sysctl":{$sysctls},
-  "env":{$envs},
+  "sysctl":{
+    $sysctls
+  },
+  "env":{
+    $envs
+  },
   "user":"$user",
   "caps":[$caps],
   "no_new_privs":$no_new_privs,
-  "ps":{$pss}
+  "ps":{
+    $pss
+  }
 }
 EOF
 cat healthcheck.json
