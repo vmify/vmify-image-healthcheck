@@ -25,6 +25,7 @@ readonly hugepages=$(ls -ld /dev/hugepages | awk '{$2=$5=$6=$7=$8=""; print $1, 
 readonly mqueue=$(ls -ld /dev/mqueue | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 readonly shm=$(ls -ld /dev/shm | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 readonly loop=$(if [ -b /dev/loop0 ]; then echo "true"; else echo "false"; fi)
+readonly kmsg=$(if [ -c /dev/kmsg ]; then echo "true"; else echo "false"; fi)
 readonly apparmor=$(if [ "$(cat /sys/module/apparmor/parameters/enabled)" = "Y" ]; then echo "true"; else echo "false"; fi)
 readonly securityfs=$(ls -ld /sys/kernel/security | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 
@@ -88,6 +89,7 @@ cat > healthcheck.json<< EOF
   "mqueue":"$mqueue",
   "shm":"$shm",
   "loop":$loop,
+  "kmsg":$kmsg,
   "apparmor":$apparmor,
   "securityfs":"$securityfs",
   "bios_version":"$bios_version",
