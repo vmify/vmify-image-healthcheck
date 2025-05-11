@@ -26,6 +26,7 @@ readonly mqueue=$(ls -ld /dev/mqueue | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4
 readonly shm=$(ls -ld /dev/shm | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 readonly loop=$(if [ -b /dev/loop0 ]; then echo "true"; else echo "false"; fi)
 readonly kmsg=$(if [ -c /dev/kmsg ]; then echo "true"; else echo "false"; fi)
+readonly tun=$(if [ -c /dev/net/tun ]; then echo "true"; else echo "false"; fi)
 readonly apparmor=$(if [ "$(cat /sys/module/apparmor/parameters/enabled)" = "Y" ]; then echo "true"; else echo "false"; fi)
 readonly securityfs=$(ls -ld /sys/kernel/security | awk '{$2=$5=$6=$7=$8=""; print $1, $3, $4, $9}')
 
@@ -90,6 +91,7 @@ cat > healthcheck.json<< EOF
   "shm":"$shm",
   "loop":$loop,
   "kmsg":$kmsg,
+  "tun":$tun,
   "apparmor":$apparmor,
   "securityfs":"$securityfs",
   "bios_version":"$bios_version",
