@@ -11,7 +11,7 @@ if [ "$caps" = '"[NONE]"' ]; then
   readonly caps=''
 fi
 readonly no_new_privs=$(if [ "$(setpriv -d | grep "no_new_privs:" | cut -d': ' -f2)" = " 0" ]; then echo "false"; else echo "true"; fi)
-readonly elf32=$(if [ "$(/elf32)" = "Hello world" ]; then echo "true"; else echo "false"; fi)
+readonly elf32=$(if [ "$(/elf32 2&>/dev/null)" = "Hello world" ]; then echo "true"; else echo "false"; fi)
 readonly bpf_syscall=$(grep -q '\bbpf_sys_bpf\b' /proc/kallsyms && echo true || echo false)
 
 touch test-xattr
